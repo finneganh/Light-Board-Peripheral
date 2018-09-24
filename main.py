@@ -11,8 +11,63 @@ from preset import Preset
 
 NEOPIXEL_PIN = board.D5
 
+
+###
+    # newRgb = hsl2rgb(hue, 1.0, brightness)
+    # if newRgb != self.rgb:
+    #   self.rgb = newRgb
+    #   return True
+
+    # else:
+    #   return False
+
+# Derived from: http://www.easyrgb.com/en/math.php#text2
+#
+# Input range: 0–1
+# Output range: 0—255
+def hsl2rgb(h, s, l):
+  if s is 0:
+    r = l * 255
+    g = l * 255
+    b = l * 255
+  
+  else:
+    if l < 0.5:
+      v2 = l * (1 + s)
+    else:
+      v2 = (l + s) - (s * l)
+
+    v1 = 2 * l - v2
+
+    r = 255 * hue2rgb(v1, v2, h + 0.33333)
+    g = 255 * hue2rgb(v1, v2, h)
+    b = 255 * hue2rgb(v1, v2, h - 0.33333)
+
+  return (int(r), int(g), int(b))
+
+def hue2rgb(v1, v2, vh):
+  if vh < 0:
+    vh += 1
+
+  if vh > 1:
+    vh -= 1
+  
+  if vh * 6 < 1:
+    return v1 + (v2 - v1) * 6 * vh
+
+  if vh * 2 < 1:
+    return v2
+  
+  if vh * 3 < 2:
+    return v1 + (v2 - v1) * (0.666666 - vh) * 6
+
+  return v1
+
+
+###
+
 PIXELS_PER_STRIP = 8
-STRIP_COUNT = 2
+STRIP_COUNT = 4
 
 COMMAND_PREFIX = 0xF0
 COMMAND_GET_STATUS = 0x10
@@ -112,16 +167,15 @@ def readCommandFromBtle():
     command = data[0]
 
     if command is COMMAND_SET_LIGHT:
-        data = btle.read(4)
-        if data is None or len(data) < 4:
+        data = btle.read(3)
+        if data is None or len(data) < 3:
             return (False, data)
 
         s = data[0]
-        r = data[1]
-        g = data[2]
-        b = data[3]
+        hue = data[1] / 255
+        brightness = data[2] / 255
 
-        setStripValue(s, (r, g, b))
+        setStripValue(s, hsl2rgb(hue, 1.0, brightness))
         currentPresetNum = 255
 
         strip.show()
