@@ -81,10 +81,10 @@ STATE_CONNECTED = 1
 STATE_UNINITIALIZED = 2
 
 strip = neopixel.NeoPixel(
-    NEOPIXEL_PIN, PIXELS_PER_STRIP * STRIP_COUNT, brightness=0.3, auto_write=False)
+    NEOPIXEL_PIN, PIXELS_PER_STRIP * STRIP_COUNT, brightness=0.4, auto_write=False)
 btle = busio.UART(board.TX, board.RX, baudrate=9600, timeout=100)
 
-strip.fill((0, 255, 0))
+strip.fill((0, 0, 0))
 strip.show()
 
 allowWriteIo = digitalio.DigitalInOut(board.D2)
@@ -257,8 +257,16 @@ def readFromBlte():
     else:
         print(bufToString(data), end="")
 
+
 def main():
     print("Peripheral started")
+
+
+    setStripValue(0, (255, 0, 0))
+    setStripValue(1, (0, 0, 255))
+    setStripValue(2, (255, 0, 255))
+    setStripValue(3, (0, 255, 0))
+    strip.show()
 
     if statusInIo.value:
         print("Bluetooth already connected")
