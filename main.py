@@ -9,17 +9,9 @@ import digitalio
 
 from preset import Preset
 
+PROD_MODE = False
+
 NEOPIXEL_PIN = board.D5
-
-
-###
-    # newRgb = hsl2rgb(hue, 1.0, brightness)
-    # if newRgb != self.rgb:
-    #   self.rgb = newRgb
-    #   return True
-
-    # else:
-    #   return False
 
 # Derived from: http://www.easyrgb.com/en/math.php#text2
 #
@@ -66,7 +58,7 @@ def hue2rgb(v1, v2, vh):
 
 ###
 
-PIXELS_PER_STRIP = 8
+PIXELS_PER_STRIP = 8 if PROD_MODE else 2
 STRIP_COUNT = 4
 
 COMMAND_PREFIX = 0xF0
@@ -80,8 +72,10 @@ STATE_DISCONNECTED = 0
 STATE_CONNECTED = 1
 STATE_UNINITIALIZED = 2
 
+BRIGHTNESS = 0.3 if PROD_MODE else 0.1
+
 strip = neopixel.NeoPixel(
-    NEOPIXEL_PIN, PIXELS_PER_STRIP * STRIP_COUNT, brightness=0.4, auto_write=False)
+    NEOPIXEL_PIN, PIXELS_PER_STRIP * STRIP_COUNT, brightness=BRIGHTNESS, auto_write=False)
 btle = busio.UART(board.TX, board.RX, baudrate=9600, timeout=100)
 
 strip.fill((0, 0, 0))
@@ -104,8 +98,6 @@ PRESETS = [
     Preset(0, canWrite = allowWrite),
     Preset(1, canWrite = allowWrite),
     Preset(2, canWrite = allowWrite),
-    Preset(3, canWrite = allowWrite),
-    Preset(4, canWrite = allowWrite),
 ]
 
 currentPresetNum = 255
