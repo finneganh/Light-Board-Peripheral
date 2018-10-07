@@ -1,6 +1,6 @@
 
 class Preset:
-  def __init__(self, num, canWrite = False):
+  def __init__(self, num):
     self.num = num
     self.values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
